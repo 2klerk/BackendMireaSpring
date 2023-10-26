@@ -1,14 +1,16 @@
 package com.example.pr53.Controller;
 
+import com.example.pr53.CreateMessage;
 import com.example.pr53.Entity.Client;
 import com.example.pr53.Market;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 
 @RestController
 public class Route {
-    HashMap<String, Client> clients = new HashMap<>();
+    public static HashMap<String, Client> clients = new HashMap<>();
     public static Market market = new Market();
 
     @PostMapping("/Client")
@@ -20,9 +22,9 @@ public class Route {
         if (!clients.containsKey(email)) {
             Client client = new Client(name, email, password);
             clients.put(email, client);
-            return "Client created";
+            return CreateMessage.create("Client");
         }
-        else return "Client already created";
+        else return CreateMessage.alredCreated("Client");
     }
 
     @DeleteMapping("/Client")
@@ -34,11 +36,11 @@ public class Route {
             Client client=clients.get(email);
             if(checkData(email,password,client)){
                 clients.remove(email);
-                return "Client deleted";
+                return CreateMessage.delete("Client");
             }
-            else return "Client password wrong";
+            else return CreateMessage.WrongPassword();
         }
-        else return "Client not found";
+        else return CreateMessage.ClientNotFound();
     }
 
     @GetMapping("/Client")
@@ -51,9 +53,9 @@ public class Route {
             if(checkData(email,password,client)){
                 return client.toString();
             }
-            else return "Wrong Password";
+            else return CreateMessage.WrongPassword();
         }
-        else return "Clients nof found";
+        else return CreateMessage.ClientNotFound();
     }
 
     @GetMapping("/Client/getClients")
@@ -94,8 +96,8 @@ public class Route {
         }
         else return "Client not found";
     }
-    private Boolean checkData(String email,String password,Client client){
-        return client!=null&&client.getEmail().equals(email) && client.getPassword().equals(password);
+    public static Boolean checkData(String email, String password, Client client){
+        return client!=null && client.getEmail().equals(email) && client.getPassword().equals(password);
     }
 
     @PostMapping("Client/Cart/add")
@@ -110,9 +112,9 @@ public class Route {
                 client.addToCart(article);
                 return "Product added";
             }
-            else return "Wrong password";
+            else return CreateMessage.WrongPassword();
         }
-        else return "Client not found";
+        else return CreateMessage.ClientNotFound();
     }
     @GetMapping("Client/Cart/print")
     public String printCart(
@@ -125,9 +127,9 @@ public class Route {
                 client.printCart();
                 return "Product printed";
             }
-            else return "Wrong password";
+            else return CreateMessage.WrongPassword();
         }
-        else return "Client not found";
+        else return CreateMessage.ClientNotFound();
     }
 
     @GetMapping("Client/Cart/delete")
@@ -140,11 +142,33 @@ public class Route {
             Client client = clients.get(email);
             if(checkData(email,password,client)){
                 client.deleteFromCart(select);
-                return "Product deleted";
+                return CreateMessage.delete("Product");
             }
-            else return "Wrong password";
+            else return CreateMessage.WrongPassword();
         }
-        else return "Client not found";
+        else return CreateMessage.ClientNotFound();
     }
+
+    @PostMapping("Client/Cart/createOrder")
+    public String createOrder(
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam Integer select
+    ){
+        if (clients.containsKey(email)){
+            Client client = clients.get(email);
+            if(checkData(email,password,client)){
+                client.createOrder(select);
+                return CreateMessage.create("Order");
+            }
+            else  {
+                return CreateMessage.WrongPassword();
+            }
+        }
+        else{
+            return CreateMessage.ClientNotFound();
+        }
+    }
+
 
 }

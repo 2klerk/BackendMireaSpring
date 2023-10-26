@@ -1,45 +1,31 @@
 package com.example.pr53.Entity;
 
 import com.example.pr53.Controller.Route;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Client
 {
-    private static final String SECRET_KEY = "secretKey";
     //содержат артикулы(номера товара)
     private final ArrayList<Integer> cart = new ArrayList<>();
-//    private final ArrayList<Object> orders = null;
     private static int idCounter = 0;
+    @Getter
     private final String id;
+    @Getter
     private String name;
+
     private final String email;
+
     private String password;
+    private String Role = "USER";
     public Client(String name, String email,String password){
         this.id = generateId();
         this.name = name;
         this.email = email;
         this.password = password;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     private String generateId() {
@@ -53,8 +39,8 @@ public class Client
         this.password=pass;
     }
 
-    public ArrayList<Integer> getCart() {
-        return cart;
+    public String getCart() {
+        return printCart();
     }
 
     public void addToCart(Integer article){
@@ -73,48 +59,46 @@ public class Client
                 '}';
     }
 
-    public void printCart(){
+    public String printCart(){
 //         оптимизировать (тк может быть больше 200000 товаров)
-        System.out.println(this.cart.size());
+//        System.out.println(this.cart.size());
+        ArrayList<String> cartList = new ArrayList<>();
         for(int i=0;i<this.cart.size();i++){
-            System.out.println(Route.market.getMarketList().get(this.cart.get(i)).getProduct());
+            cartList.add(Route.market.getMarketList().get(this.cart.get(i)).getProduct());
         }
+        return cartList.toString();
     }
 
 
     public void deleteFromCart(Integer select) {
-        this.cart.remove(this.cart.get(select));
+        this.cart.remove(select);
         System.out.println("product deleted");
     }
 
-    public static String generateToken(String subject, long ttlMillis) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + ttlMillis);
-
-        return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
+    public void createOrder(Integer select){
+        Integer article = this.cart.get(select);
+        System.out.println(Route.market.getMarketList().get(this.cart.get(article)).getProduct());
     }
 
-    public static boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public void setRole(String role) {
+        Role = role;
     }
 
-    public static String getSubjectFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
 
-        return claims.getSubject();
+    public String getEmail() {
+        return email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return Role;
+    }
+
+    //code код действия для тикета
+    public JSONObject sendTicket(Integer code){
+        return new JSONObject().put("message", code);
+    }
 }
