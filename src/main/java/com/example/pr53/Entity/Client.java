@@ -1,10 +1,16 @@
 package com.example.pr53.Entity;
 
-import com.example.pr53.Route;
+import com.example.pr53.Controller.Route;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 public class Client
 {
+    private static final String SECRET_KEY = "secretKey";
     //содержат артикулы(номера товара)
     private final ArrayList<Integer> cart = new ArrayList<>();
 //    private final ArrayList<Object> orders = null;
@@ -13,17 +19,11 @@ public class Client
     private String name;
     private final String email;
     private String password;
-
-    private String role;
-
-    public Client(String name, String email,String password,
-                  String role){
-        this.role = role;
+    public Client(String name, String email,String password){
         this.id = generateId();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = "USER";
     }
 
     public String getId() {
@@ -86,4 +86,35 @@ public class Client
         this.cart.remove(this.cart.get(select));
         System.out.println("product deleted");
     }
+
+    public static String generateToken(String subject, long ttlMillis) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + ttlMillis);
+
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
+
+    public static boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static String getSubjectFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
+
 }

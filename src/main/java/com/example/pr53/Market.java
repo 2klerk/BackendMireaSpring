@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class Market {
     public static HashMap<Integer, Product>MarketList=new HashMap<>();
-    Market(){
+    public Market(){
         createMarket();
     }
     private void createMarket(){

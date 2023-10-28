@@ -1,6 +1,7 @@
-package com.example.pr53;
+package com.example.pr53.Controller;
 
 import com.example.pr53.Entity.Client;
+import com.example.pr53.Market;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class Route {
             @RequestParam String name
     ) {
         if (!clients.containsKey(email)) {
-            Client client = new Client(name, email, password, "USER");
+            Client client = new Client(name, email, password);
             clients.put(email, client);
             return "Client created";
         }
@@ -41,18 +42,18 @@ public class Route {
     }
 
     @GetMapping("/Client")
-    public Client getClient(
+    public String getClient(
             @RequestParam String email,
             @RequestParam String password
     ) {
         if (clients.containsKey(email)){
             Client client = clients.get(email);
             if(checkData(email,password,client)){
-                return client;
+                return client.toString();
             }
-            else return null;
+            else return "Wrong Password";
         }
-        else return null;
+        else return "Clients nof found";
     }
 
     @GetMapping("/Client/getClients")
