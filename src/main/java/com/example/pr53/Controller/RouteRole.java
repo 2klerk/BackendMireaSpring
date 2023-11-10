@@ -2,42 +2,42 @@ package com.example.pr53.Controller;
 
 import com.example.pr53.CreateMessage;
 import com.example.pr53.Entity.Client;
-import org.apache.catalina.User;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
+//@Service
 @RestController
 public class RouteRole {
     ArrayList<String> TicketListAdmin = new ArrayList<>();
     ArrayList<String> TicketListSeller = new ArrayList<>();
 
-    @PutMapping("Client/Role")
+    @PostMapping("Client/Role")
     public String roleTicket(
             @RequestParam String email,
             @RequestParam String password,
-            @RequestParam Integer Role
+            @RequestParam String Role
     ) {
         Client client = Route.clients.get(email);
         if (client != null) {
             if (Objects.equals(password, client.getPassword())) {
-                switch (Role) {
-                    case 0:
+                return switch (Role) {
+                    case "ADMIN" -> {
                         TicketListAdmin.add(email);
-                        return "Ticket (role changing to admin) sent";
-                    case 1:
+                        yield new JSONObject().put("message", "Ticket (role changing to admin) sent").toString();
+                    }
+                    case "SELLER" -> {
                         TicketListSeller.add(email);
-                        return "Ticket (role changing to seller) sent";
-                    default:
-                        return "Role not found";
-                }
+                        yield new JSONObject().put("message", "Ticket (role changing to seller) sent").toString();
+                    }
+                    default -> new JSONObject().put("message", "Role not found").toString();
+                };
             } else {
-                return "Password wrong";
+                return new JSONObject().put("message","Password wrong").toString();
             }
-        } else return "Client not found";
+        } else return new JSONObject().put("message","Client not found").toString();
     }
 
     @GetMapping("Client/Role")
@@ -60,7 +60,7 @@ public class RouteRole {
         } else return CreateMessage.ClientNotFound();
     }
 
-    @PostMapping("Client/Role")
+    @PutMapping("Client/Role")
     public String roleSet(
             @RequestParam String email,
             @RequestParam String password,
@@ -81,4 +81,5 @@ public class RouteRole {
             }
         } else return CreateMessage.ClientNotFound();
     }
+
 }

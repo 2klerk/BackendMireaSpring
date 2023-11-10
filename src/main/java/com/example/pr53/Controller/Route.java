@@ -2,11 +2,15 @@ package com.example.pr53.Controller;
 
 import com.example.pr53.CreateMessage;
 import com.example.pr53.Entity.Client;
+import com.example.pr53.JWT.JwtUtils;
 import com.example.pr53.Market;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import org.json.JSONObject;
+import org.apache.tomcat.util.http.parser.TokenList;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 public class Route {
@@ -22,7 +26,8 @@ public class Route {
         if (!clients.containsKey(email)) {
             Client client = new Client(name, email, password);
             clients.put(email, client);
-            return CreateMessage.create("Client");
+            String token = JwtUtils.generateToken(email);
+            return CreateMessage.create("Client",token);
         }
         else return CreateMessage.alredCreated("Client");
     }
@@ -45,6 +50,7 @@ public class Route {
 
     @GetMapping("/Client")
     public String getClient(
+//            @RequestParam String token
             @RequestParam String email,
             @RequestParam String password
     ) {
@@ -65,19 +71,18 @@ public class Route {
 
     @PutMapping("/Client/Update/Name")
     public String updName(
-            @RequestParam String email,
-            @RequestParam String password,
+//            @RequestParam String email,
+//            @RequestParam String password,
+            @RequestParam String token,
             @RequestParam String name
     ){
-        if(clients.containsKey(email)){
+        if(JwtUtils.validateToken(token)){
+            String email = JwtUtils.TokenList.get(token);
             Client client=clients.get(email);
-            if(checkData(email,password,client)){
-                client.setName(name);
-                return "Client name updated";
-            }
-            else return "Client password wrong";
+            client.setName(name);
+            return "Client name updated";
         }
-        else return "Client not found";
+        else return "Token not valid, signing again";
     }
 
     @PutMapping("/Client/Update/Password")
@@ -159,7 +164,7 @@ public class Route {
             Client client = clients.get(email);
             if(checkData(email,password,client)){
                 client.createOrder(select);
-                return CreateMessage.create("Order");
+                return CreateMessage.createObject("Order");
             }
             else  {
                 return CreateMessage.WrongPassword();
@@ -169,6 +174,7 @@ public class Route {
             return CreateMessage.ClientNotFound();
         }
     }
+
 
 
 }

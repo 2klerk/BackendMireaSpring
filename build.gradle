@@ -19,12 +19,17 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.projectlombok:lombok:1.18.28'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.json:json:20230227'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+//    implementation 'org.springframework.web:filter'
+//    implementation 'io.json:jewk:0.9.5'
+//    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api-parent', version: '3.0.0', ext: 'pom'
 }
 
 tasks.named('test') {

@@ -27,6 +27,13 @@ public class Client
         this.email = email;
         this.password = password;
     }
+    public Client(String name, String email,String password,String Role){
+        this.id = generateId();
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.Role = Role;
+    }
 
     private String generateId() {
         idCounter++;

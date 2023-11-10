@@ -1,5 +1,6 @@
 package com.example.pr53;
 
+import com.example.pr53.JWT.JwtUtils;
 import org.json.JSONObject;
 
 public class CreateMessage {
@@ -12,7 +13,12 @@ public class CreateMessage {
         json.put("message", " Wrong password");
         return json.toString();
     }
-    public static String create(String obj){
+    public static String create(String obj, String token){
+        json.put("message", obj+" created");
+        json.put("token", token);
+        return json.toString();
+    }
+    public static String createObject(String obj){
         json.put("message", obj+" created");
         return json.toString();
     }
